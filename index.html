@@ -3,13 +3,182 @@
 <head>
   <meta charset="UTF-8">
   <title>again</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: white;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+
+    .heart {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 120px;
+      z-index: 10;
+      line-height: 1;
+    }
+
+    .study-link {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: block;
+      width: 90vw;
+      max-width: 500px;
+      cursor: pointer;
+      z-index: 20;
+    }
+
+    .study-img {
+      width: 100%;
+      height: auto;
+      opacity: 0.92;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .study-link:hover .study-img {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+
+    .study-img.clicked {
+      animation: studyClick 0.55s ease forwards;
+    }
+
+    @keyframes studyClick {
+      0% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.05) rotate(-2deg); }
+      100% { transform: scale(0.96) rotate(2deg); }
+    }
+
+    #skelly {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      width: 125px;
+      opacity: 0;
+      transform: scale(0.5) rotate(0deg);
+      pointer-events: none;
+      z-index: 998;
+    }
+
+    #skelly.freak {
+      opacity: 1;
+      animation: skellyFreak 0.75s ease-in-out forwards;
+    }
+
+    @keyframes skellyFreak {
+      0% {
+        transform: scale(0.2) rotate(0deg);
+        filter: invert(0);
+        opacity: 0;
+      }
+      15% {
+        transform: scale(1.45) rotate(24deg);
+        filter: invert(1);
+        opacity: 1;
+      }
+      35% {
+        transform: scale(0.9) rotate(-35deg);
+        filter: invert(0);
+      }
+      55% {
+        transform: scale(1.55) rotate(52deg);
+        filter: invert(1);
+      }
+      75% {
+        transform: scale(1.1) rotate(-20deg);
+        filter: invert(0);
+      }
+      100% {
+        transform: scale(0.75) rotate(360deg);
+        filter: invert(1);
+        opacity: 0;
+      }
+    }
+
+    #flash {
+      position: fixed;
+      inset: 0;
+      background: white;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 999;
+      transition: opacity 0.08s ease;
+    }
+
+    .tiny-text {
+      position: fixed;
+      bottom: 12px;
+      left: 20px;
+      font-size: 10px;
+      opacity: 0.55;
+      z-index: 5;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 600px) {
+      .heart {
+        font-size: 82px;
+        top: 16px;
+        left: 16px;
+      }
+
+      .study-link {
+        width: 92vw;
+      }
+
+      #skelly {
+        width: 100px;
+        right: 14px;
+        bottom: 18px;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-  <div style="font-size:120px;">♡</div>
+  <div class="heart">♡</div>
 
-  <p style="font-size:10px;">hi, this site is a work in progress</p>
-  <p style="font-size:10px;">come back later</p>
+  <div class="study-link" onclick="goStudy()">
+    <img src="study.png" class="study-img" id="studyImg" alt="too busy studying">
+  </div>
+
+  <img src="skelly.png" id="skelly" alt="">
+
+  <div id="flash"></div>
+
+  <div class="tiny-text">
+    <div>hi, this site is a work in progress</div>
+    <div>come back later</div>
+  </div>
+
+  <script>
+    function goStudy() {
+      const img = document.getElementById("studyImg");
+      const skelly = document.getElementById("skelly");
+      const flash = document.getElementById("flash");
+
+      img.classList.add("clicked");
+      skelly.classList.add("freak");
+
+      flash.style.opacity = "1";
+
+      setTimeout(() => {
+        flash.style.opacity = "0";
+      }, 90);
+
+      setTimeout(() => {
+        window.location.href = "https://haylortall.github.io/ap2final/";
+      }, 750);
+    }
+  </script>
 
 </body>
 </html>
