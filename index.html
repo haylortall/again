@@ -11,6 +11,7 @@
       color: white;
       font-family: sans-serif;
       overflow: hidden;
+      height: 100vh;
     }
 
     .heart {
@@ -18,8 +19,18 @@
       top: 20px;
       left: 20px;
       font-size: 120px;
-      z-index: 10;
       line-height: 1;
+      z-index: 10;
+    }
+
+    .top-text {
+      position: fixed;
+      top: 150px;
+      left: 24px;
+      font-size: 10px;
+      opacity: 0.6;
+      line-height: 1.4;
+      z-index: 10;
     }
 
     .study-link {
@@ -27,9 +38,8 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      display: block;
       width: 90vw;
-      max-width: 500px;
+      max-width: 520px;
       cursor: pointer;
       z-index: 20;
     }
@@ -39,11 +49,12 @@
       height: auto;
       opacity: 0.92;
       transition: transform 0.2s ease, opacity 0.2s ease;
+      display: block;
     }
 
     .study-link:hover .study-img {
       opacity: 1;
-      transform: scale(1.02);
+      transform: scale(1.015);
     }
 
     .study-img.clicked {
@@ -52,54 +63,45 @@
 
     @keyframes studyClick {
       0% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.05) rotate(-2deg); }
-      100% { transform: scale(0.96) rotate(2deg); }
+      35% { transform: scale(1.04) rotate(-2deg); }
+      70% { transform: scale(0.97) rotate(2deg); }
+      100% { transform: scale(1) rotate(0deg); }
     }
 
     #skelly {
       position: fixed;
-      right: 22px;
-      bottom: 22px;
-      width: 125px;
-      opacity: 0;
-      transform: scale(0.5) rotate(0deg);
-      pointer-events: none;
-      z-index: 998;
+      width: 90px;
+      left: 70vw;
+      top: 65vh;
+      opacity: 0.85;
+      z-index: 30;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-drag: none;
+      transition: filter 0.15s ease, opacity 0.15s ease;
+    }
+
+    #skelly:hover {
+      opacity: 1;
+      filter: invert(1);
+    }
+
+    #skelly.dragging {
+      cursor: grabbing;
+      filter: invert(1);
     }
 
     #skelly.freak {
-      opacity: 1;
       animation: skellyFreak 0.75s ease-in-out forwards;
     }
 
     @keyframes skellyFreak {
-      0% {
-        transform: scale(0.2) rotate(0deg);
-        filter: invert(0);
-        opacity: 0;
-      }
-      15% {
-        transform: scale(1.45) rotate(24deg);
-        filter: invert(1);
-        opacity: 1;
-      }
-      35% {
-        transform: scale(0.9) rotate(-35deg);
-        filter: invert(0);
-      }
-      55% {
-        transform: scale(1.55) rotate(52deg);
-        filter: invert(1);
-      }
-      75% {
-        transform: scale(1.1) rotate(-20deg);
-        filter: invert(0);
-      }
-      100% {
-        transform: scale(0.75) rotate(360deg);
-        filter: invert(1);
-        opacity: 0;
-      }
+      0% { transform: scale(1) rotate(0deg); filter: invert(0); opacity: 1; }
+      15% { transform: scale(1.6) rotate(30deg); filter: invert(1); }
+      35% { transform: scale(0.8) rotate(-45deg); filter: invert(0); }
+      55% { transform: scale(1.7) rotate(70deg); filter: invert(1); }
+      75% { transform: scale(1.1) rotate(-25deg); filter: invert(0); }
+      100% { transform: scale(0.7) rotate(360deg); filter: invert(1); opacity: 0; }
     }
 
     #flash {
@@ -112,16 +114,6 @@
       transition: opacity 0.08s ease;
     }
 
-    .tiny-text {
-      position: fixed;
-      bottom: 12px;
-      left: 20px;
-      font-size: 10px;
-      opacity: 0.55;
-      z-index: 5;
-      line-height: 1.4;
-    }
-
     @media (max-width: 600px) {
       .heart {
         font-size: 82px;
@@ -129,14 +121,17 @@
         left: 16px;
       }
 
+      .top-text {
+        top: 110px;
+        left: 20px;
+      }
+
       .study-link {
         width: 92vw;
       }
 
       #skelly {
-        width: 100px;
-        right: 14px;
-        bottom: 18px;
+        width: 70px;
       }
     }
   </style>
@@ -146,6 +141,11 @@
 
   <div class="heart">♡</div>
 
+  <div class="top-text">
+    <div>hi, this site is a work in progress</div>
+    <div>come back later</div>
+  </div>
+
   <div class="study-link" onclick="goStudy()">
     <img src="study.png" class="study-img" id="studyImg" alt="too busy studying">
   </div>
@@ -154,15 +154,78 @@
 
   <div id="flash"></div>
 
-  <div class="tiny-text">
-    <div>hi, this site is a work in progress</div>
-    <div>come back later</div>
-  </div>
-
   <script>
+    const skelly = document.getElementById("skelly");
+
+    let x = window.innerWidth * 0.7;
+    let y = window.innerHeight * 0.65;
+    let dx = 1.4;
+    let dy = 1.1;
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    function bounceSkelly() {
+      if (!dragging) {
+        x += dx;
+        y += dy;
+
+        const rect = skelly.getBoundingClientRect();
+        const w = rect.width || 90;
+        const h = rect.height || 90;
+
+        if (x <= 0 || x + w >= window.innerWidth) dx *= -1;
+        if (y <= 0 || y + h >= window.innerHeight) dy *= -1;
+
+        skelly.style.left = x + "px";
+        skelly.style.top = y + "px";
+      }
+
+      requestAnimationFrame(bounceSkelly);
+    }
+
+    skelly.addEventListener("mousedown", (e) => {
+      dragging = true;
+      skelly.classList.add("dragging");
+      offsetX = e.clientX - skelly.offsetLeft;
+      offsetY = e.clientY - skelly.offsetTop;
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!dragging) return;
+      x = e.clientX - offsetX;
+      y = e.clientY - offsetY;
+      skelly.style.left = x + "px";
+      skelly.style.top = y + "px";
+    });
+
+    window.addEventListener("mouseup", () => {
+      dragging = false;
+      skelly.classList.remove("dragging");
+    });
+
+    skelly.addEventListener("touchstart", (e) => {
+      dragging = true;
+      const touch = e.touches[0];
+      offsetX = touch.clientX - skelly.offsetLeft;
+      offsetY = touch.clientY - skelly.offsetTop;
+    });
+
+    window.addEventListener("touchmove", (e) => {
+      if (!dragging) return;
+      const touch = e.touches[0];
+      x = touch.clientX - offsetX;
+      y = touch.clientY - offsetY;
+      skelly.style.left = x + "px";
+      skelly.style.top = y + "px";
+    });
+
+    window.addEventListener("touchend", () => {
+      dragging = false;
+    });
+
     function goStudy() {
       const img = document.getElementById("studyImg");
-      const skelly = document.getElementById("skelly");
       const flash = document.getElementById("flash");
 
       img.classList.add("clicked");
@@ -178,6 +241,8 @@
         window.location.href = "https://haylortall.github.io/ap2final/";
       }, 750);
     }
+
+    bounceSkelly();
   </script>
 
 </body>
