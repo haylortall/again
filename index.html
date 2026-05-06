@@ -6,9 +6,9 @@
 
   <style>
     body {
-      margin: 0;
-      background: #000;
-      color: white;
+  margin: 0;
+  background: #f6f3ea; /* off white */
+  color: black;
       font-family: sans-serif;
       overflow: hidden;
       height: 100vh;
@@ -21,6 +21,8 @@
       font-size: 120px;
       line-height: 1;
       z-index: 10;
+  color: black;
+}
     }
 
     .top-text {
@@ -92,7 +94,7 @@
     }
 
     #skelly.freak {
-      animation: skellyFreak 0.75s ease-in-out forwards;
+      animation: skellyFreak 5s ease-in-out forwards;
     }
 
     @keyframes skellyFreak {
@@ -235,11 +237,11 @@
 
       setTimeout(() => {
         flash.style.opacity = "0";
-      }, 90);
+      }, 300);
 
       setTimeout(() => {
         window.location.href = "https://haylortall.github.io/ap2final/";
-      }, 750);
+      }, 5000);
     }
 
     bounceSkelly();
